@@ -34,12 +34,14 @@ class Controller {
     static remove(req, res) {
         Model.findByIdAndDelete(req.params.id)
             .then(function (data) {
-                res.send('ok')
+                res.status(200).json(data)
                 console.log(data);
 
             })
             .catch(function (err) {
-                res.send(err)
+                res.status(500).json({
+                    messege: err.message
+                })
             })
     }
 

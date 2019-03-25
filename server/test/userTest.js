@@ -119,19 +119,24 @@ describe(' Product', function () {
     })
 })
 
-// ==============DELETE================================
+// ===============================================ROLE
 
-describe(' Product', function () {
-    describe('sukses', function () {
-        it('should delete carts', function (done) {
-            chai
-                .request(app)
-                .delete('/carts/' + id_cart)
-                .set('Authorization', token)
-                .end(function (err, res) {
-                    expect(res).to.have.status(200);
-                    done()
-                })
-        });
+describe('ROLE CEK EROR', function () {
+    it('should return  Users object', function (done) {
+        chai.request(app)
+
+            .post('/user/role')
+
+            .set({
+                token: 'huhllol34k3lj'
+            })
+            .then(function (response) {
+                response.should.have.status(200)
+
+                done()
+            })
+            .catch(function (err) {
+                console.log(err)
+            })
     })
 })

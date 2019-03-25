@@ -1,9 +1,124 @@
 const Model = require('../model/user')
 const bcrypt = require('bcrypt');
-const jwt = require('../helper/jwt')
+const Product = require('../model/product')
+const jwt = require('../helper/jwt'),
+    images = require('../helper/images')
 class Controller {
 
 
+    static unggah(req, res) {
+        // var a = images.multer.single('image')
+
+        let validasi = jwt.verify(req.headers.token)
+        // console.log(validasi);
+        console.log('ini req.filenya', req.file)
+        console.log("masuk sini foto", req.body)
+
+
+        let obj = {
+
+            name: req.body.title,
+            price: req.body.price,
+            tag: req.body.tag,
+            image: req.file.cloudStoragePublicUrl
+        }
+        console.log(obj);
+
+        Model.findOne({
+                email: validasi.email
+            })
+            .then(data => {
+                if (data.length == 0) {
+                    throw Error
+                } else {
+
+                    return Product.create(obj)
+                }
+            })
+            .then(function (data) {
+                res.status(200).json(data)
+            })
+            .catch(function (err) {
+                res.status(500).json({
+                    messege: err.message
+                })
+            })
+
+    }
+    static role(req, res) {
+        // console.log('--------');
+
+        var validation = jwt.verify(req.headers.token)
+        // console.log(validation, 'jjjjjjjjjjj');
+
+        Model.findOne({
+                email: validation.email
+            })
+            .then(data => {
+                res.status(200).json(data)
+                // console.log(data);
+
+            })
+            .catch(err => {
+                res.status(500).json({
+                    messege: err.message
+                })
+            })
+    }
+    static pay(req, res) {
+        var validation = jwt.verify(req.headers.token)
+        Model.findOne({
+                email: validation.email
+            })
+            .then(function (data) {
+                // console.log(data, '0000');
+
+                var obj = {
+                    email: data.email,
+                    password: data.password,
+                    saldo: data.saldo,
+                    productList: [],
+                    role: 'user'
+                }
+                return Model.findOneAndUpdate(validation.email, obj)
+
+            })
+            .then(data => {
+                res.status(200).json(data)
+            })
+            .catch(function (err) {
+                res.status(500).json({
+                    messege: err.message
+                })
+            })
+    }
+    static deleteList(req, res) {
+        // console.log('masuk ini');
+
+
+        var validation = jwt.verify(req.headers.token)
+        console.log(validation);
+        console.log(req.body);
+        Model.update({
+                email: validation.email
+            }, {
+                $pop: {
+                    productList: req.body.index
+
+                }
+            })
+            .then(data => {
+                console.log(data);
+                res.status(200).json(data)
+            })
+            .catch(err => {
+                res.status(500).json({
+                    messege: err.message
+                })
+            })
+
+
+    }
     static listcart(req, res) {
         var validation = jwt.verify(req.headers.token)
         Model.find({
@@ -12,7 +127,7 @@ class Controller {
             .populate('productList')
             .then(function (data) {
                 // res.status(201).json(data)
-                res.send(data)
+                res.status(200).json(data)
             })
             .catch(function (err) {
                 res.status(500).json({
@@ -24,6 +139,8 @@ class Controller {
     static addproduct(req, res) {
         var validation = jwt.verify(req.headers.token)
         // console.log('kontrollllll');
+        console.log(req.body);
+
 
         return Model.update({
                 email: validation.email
@@ -47,7 +164,7 @@ class Controller {
 
     static all(req, res) {
 
-        console.log('allll');
+        // console.log('allll');
 
         Model.find({})
             .then(function (data) {
@@ -55,14 +172,16 @@ class Controller {
             })
 
             .catch(function (err) {
-                res.status(500)
+                res.status(500).json({
+                    messege: err.message
+                })
             })
 
     }
 
 
     static register(req, res) {
-        console.log(req.body);
+        // console.log(req.body);
 
         if (!req.body.email && !req.body.password) {
             throw Error
@@ -84,8 +203,10 @@ class Controller {
 
     static login(req, res) {
         // var validation = jwt.verify(req.headers.token)\
-        console.log('masok login');
-        if (!req.body.email && !req.body.password) {
+        // console.log(req.body);
+
+        if (req.body.email == undefined || req.body.password == undefined) {
+            // console.log('ooooo');
             throw Error
 
         } else {
@@ -93,6 +214,7 @@ class Controller {
                     email: req.body.email
                 })
                 .then(function (user) {
+                    // console.log('masok login');
 
                     let validasi = bcrypt.compareSync(req.body.password, user.password);
                     if (validasi == false) {
@@ -111,7 +233,9 @@ class Controller {
 
                 })
                 .catch(function (err) {
-                    console.log(err);
+                    res.status(500).json({
+                        messege: err.message
+                    })
                 })
         }
     }

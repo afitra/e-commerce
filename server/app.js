@@ -18,6 +18,8 @@ const express = require('express'),
     cors = require('cors'),
     mongoose = require('mongoose');
 
+
+mongoose.set('findAndUpdate', false)
 mongoose.connect('mongodb://localhost:27017/E-commerce-dev', {
     useNewUrlParser: true
 })

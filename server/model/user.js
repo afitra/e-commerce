@@ -8,30 +8,35 @@ const hash = require('../helper/hash')
 var userSchema = new Schema({
     email: {
         type: String,
-        validate: {
-            validator: function (value) {
-                return User.findOne({
-                        email: value,
-                        _id: {
-                            $ne: this._id
-                        }
-                    })
-                    .then(function (data) {
-                        if (data) {
-                            throw new Error(`Email already exist`)
-                        }
-                    })
-                    .catch(function (err) {
-                        throw new Error(err)
-                    })
+        required: true,
+        unique: true,
+        validate: [{
+            validator: function uniqueEmail(inputEmail) {
+                return new Promise((resolve, reject) => {
+                    this.model('Users').findOne({
+                            email: inputEmail
+                        })
+                        .then(function (result) {
+                            if (result) {
+                                throw new Error('Email already exists')
+                            } else {
+                                resolve()
+                            }
+                        })
+                        .catch(function (err) {
+                            reject(err.message)
+                        })
+                })
             }
-        }
+        }]
     },
     password: String,
     productList: [{
         type: Schema.Types.ObjectId,
         ref: 'Products'
-    }]
+    }],
+    saldo: Number,
+    role: String
 });
 
 userSchema.pre('save', function (next) {

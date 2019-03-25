@@ -5,9 +5,9 @@ const mongoose = require('mongoose'),
 // })
 const productSchema = new Schema({
     name: String,
+    image: String,
     price: Number,
-    detail: String,
-    url: String,
+    strock: Number,
     tag: String
 })
 
