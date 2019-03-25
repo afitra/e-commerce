@@ -27,12 +27,3 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
-
-
-###ROutes
-
-
-###ROuter for User
-
-|router|http|body|headers|description|respon|
-|/user/role|none|token|get role status user|object|
