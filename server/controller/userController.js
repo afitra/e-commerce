@@ -2,19 +2,18 @@ const Model = require('../model/user')
 const bcrypt = require('bcrypt');
 const Product = require('../model/product')
 const jwt = require('../helper/jwt'),
-    images = require('../helper/images')
+    images = require('../helper/images'),
+    transaksi = require('../model/transaksi')
 class Controller {
 
 
     static unggah(req, res) {
         // var a = images.multer.single('image')
-
+        console.log('.....ini masok');
         let validasi = jwt.verify(req.headers.token)
         // console.log(validasi);
         console.log('ini req.filenya', req.file)
         console.log("masuk sini foto", req.body)
-
-
         let obj = {
 
             name: req.body.title,
@@ -23,7 +22,6 @@ class Controller {
             image: req.file.cloudStoragePublicUrl
         }
         console.log(obj);
-
         Model.findOne({
                 email: validasi.email
             })
@@ -31,7 +29,6 @@ class Controller {
                 if (data.length == 0) {
                     throw Error
                 } else {
-
                     return Product.create(obj)
                 }
             })
@@ -67,25 +64,37 @@ class Controller {
     }
     static pay(req, res) {
         var validation = jwt.verify(req.headers.token)
-        Model.findOne({
+
+        var ID = ''
+        // console.log(req.body.data);
+        // Model.update({
+        //         $set: {
+        //             'productList': []
+        //         }
+        //     })
+        Model.findOneAndUpdate({
                 email: validation.email
+            }, {
+                productList: []
+            }, {
+                new: true
             })
             .then(function (data) {
                 // console.log(data, '0000');
-
-                var obj = {
-                    email: data.email,
-                    password: data.password,
-                    saldo: data.saldo,
-                    productList: [],
-                    role: 'user'
-                }
-                return Model.findOneAndUpdate(validation.email, obj)
-
+                ID = data._id
+                return transaksi.create({
+                    userId: ID,
+                    productList: req.body.data,
+                    status: 'on procces',
+                    tanggal: new Date()
+                })
             })
             .then(data => {
                 res.status(200).json(data)
+                console.log(data);
+
             })
+
             .catch(function (err) {
                 res.status(500).json({
                     messege: err.message
@@ -139,10 +148,10 @@ class Controller {
     static addproduct(req, res) {
         var validation = jwt.verify(req.headers.token)
         // console.log('kontrollllll');
-        console.log(req.body);
+        console.log(req.body, 'okokokok');
 
 
-        return Model.update({
+        Model.update({
                 email: validation.email
             }, {
                 $push: {
@@ -225,9 +234,9 @@ class Controller {
                         let token = jwt.sign({
                             email: user.email
                         })
-                        // console.log(token);
                         res.status(200).json({
-                            token
+                            token,
+                            role: user.role
                         })
                     }
 

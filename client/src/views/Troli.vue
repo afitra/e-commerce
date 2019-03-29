@@ -1,7 +1,7 @@
 <template>
   <div class="troli">
     <h1 v-if="data.length==0">Troli kosong belanja dong !!!</h1>
-    <div class="kotak" v-for=" item in data " v-bind:key="item._id">
+    <div class="kotak" v-for=" (item,index) in data " v-bind:key="index">
       <card v-bind:product="item" :menu="false"></card>
     </div>
   </div>
@@ -19,7 +19,7 @@ export default {
     };
   },
   mounted() {
-    this.$emit("to-troli", true);
+    this.$emit("to-troli");
 
     // console.log(token);
     axios({
@@ -39,8 +39,16 @@ export default {
       })
       .catch(err => {
         console.log(err);
-        this.$router.push("/");
+        // this.$emit("to-show");
+        // this.
+        // this.$router.push("/");
       });
+
+    // if (this.data.length == 0) {
+    //   this.$emit("to-show");
+    //   this.$router.push("/");
+    //   swal(`troli kosong`, "blanja dulu !!!", "error");
+    // }
   }
 };
 </script>

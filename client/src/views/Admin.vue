@@ -67,7 +67,8 @@ export default {
       price: "",
       tag: "",
       image: "",
-      formData: ""
+      formData: "",
+      role: ""
     };
   },
   methods: {
@@ -85,11 +86,13 @@ export default {
       formData.append("image", this.image);
       this.formData = formData;
       console.log(formData);
+
       axios
         .post(`http://localhost:3000/user/uploud`, this.formData, {
           headers: {
             "Content-Type": "multipart/form-data",
-            token: localStorage.getItem("token")
+            token: localStorage.getItem("token"),
+            role: localStorage.getItem("role")
           }
         })
         .then(data => {

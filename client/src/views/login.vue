@@ -57,11 +57,12 @@ export default {
         .then(data => {
           // console.log(data);
           localStorage.setItem("token", data.data.token);
+          localStorage.setItem("role", data.data.role);
           this.pesan = "suksess";
           swal(`${this.pesan}`, "Login  !!!", "success");
           this.email = "";
           this.password = "";
-          this.$emit("to-homepage", true);
+
           this.$emit("to-login");
           this.$router.push("/");
         })
@@ -75,6 +76,9 @@ export default {
           this.pesan = "";
         });
     }
+  },
+  mounted() {
+    this.$emit("to-homepage", true);
   }
 };
 </script>

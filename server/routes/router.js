@@ -10,8 +10,11 @@ const router = require('express').Router(),
 
 // console.log(images.cloudStoragePublicUrl, 'testing');
 router.get('/product/all', productController.all)
+router.patch('/product/edit/:id', autentic, autorize, productController.edit)
+router.delete('/product/delete/:id', autentic, autorize, productController.remove)
 router.post('/user/role', autentic, userController.role)
 router.post('/user/list', autentic, userController.listcart)
+router.get('/transaksi/admin', transaksiController.adminAll)
 router.get('/transaksi/all', autentic, transaksiController.all)
 router.patch('/user/pay', autentic, userController.pay)
 router.patch('/user/removelist', autentic, userController.deleteList)
@@ -24,7 +27,7 @@ router.post('/user/register', userController.register)
 
 // =============================DUMMY ROutes
 router.post('/product/add', productController.addproduct)
-router.delete('/product/delete/:id', productController.remove)
+
 
 
 router.get('/user/all', userController.all)

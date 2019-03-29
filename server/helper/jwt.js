@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-var secret = process.env.secret
+var secret = '123'
 
 module.exports = {
     sign(user) {

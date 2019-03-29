@@ -60,7 +60,6 @@ export default {
           this.pesan = "suksess";
           this.$router.push("/login");
           swal(`${this.pesan}`, "Login first !!!", "success");
-          this.$emit("to-homepage", true);
         })
         .catch(err => {
           this.email = "";
@@ -69,6 +68,10 @@ export default {
           swal(`${this.pesan}`, "Try Again !!!", "error");
         });
     }
+  },
+  mounted() {
+    this.$emit("to-register", true);
+    // console.log("tetetetetet");
   }
 };
 </script>

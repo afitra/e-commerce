@@ -32,24 +32,50 @@ export default {
       total: 0
     };
   },
-  mounted() {
-    this.$emit("to-transaksi", true);
-
-    // // console.log(token);
-    axios({
-      url: `/transaksi/all`,
-      method: "get",
-      headers: {
-        token: localStorage.getItem("token")
-      }
-    })
-      .then(data => {
-        var arr = data.data;
-        this.data = arr;
+  methods: {
+    adminData() {
+      axios({
+        url: `/transaksi/admin`,
+        method: "get",
+        headers: {
+          token: localStorage.getItem("token")
+        }
       })
-      .catch(err => {
-        console.log(err);
-      });
+        .then(data => {
+          console.log(data.data);
+
+          var arr = data.data;
+          this.data = arr;
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    nonAdmin() {
+      axios({
+        url: `/transaksi/all`,
+        method: "get",
+        headers: {
+          token: localStorage.getItem("token")
+        }
+      })
+        .then(data => {
+          var arr = data.data;
+          this.data = arr;
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
+  },
+  mounted() {
+    this.$emit("to-transaksi");
+    var role = localStorage.getItem("role");
+    if (role == "admin") {
+      this.adminData();
+    } else {
+      this.nonAdmin();
+    }
   }
 };
 </script>

@@ -3,6 +3,20 @@ const User = require('../model/user')
 const jwt = require('../helper/jwt')
 class Controller {
 
+
+
+    static adminAll(req, res) {
+        Model.find({})
+            .then(data => {
+                res.status(200).json(data)
+            })
+            .catch(err => {
+                res.status(500).json({
+                    messege: err.message
+                })
+            })
+    }
+
     static add(req, res) {
         var validation = jwt.verify(req.headers.token)
         // console.log('ooooo');
@@ -55,7 +69,7 @@ class Controller {
             })
             .then(data => {
                 res.status(200).json(data)
-                console.log(data);
+                // console.log(data);
 
             })
             .catch(err => {

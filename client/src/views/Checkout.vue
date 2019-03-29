@@ -33,6 +33,7 @@
           class="btn btn-primary"
           data-toggle="modal"
           data-target="#exampleModal"
+          v-on:click.prevent="getModal()"
         >Pay Now</button>
         <!-- modal -->
         <div
@@ -42,6 +43,7 @@
           role="dialog"
           aria-labelledby="exampleModalLabel"
           aria-hidden="true"
+          v-if="modal"
         >
           <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -81,10 +83,19 @@ export default {
     return {
       data: [],
       total: 0,
-      code: ""
+      code: "",
+      modal: false
     };
   },
   methods: {
+    getModal() {
+      if (this.data.length > 0) {
+        this.modal = true;
+      } else {
+        this.modal = false;
+        swal(`you dont have any checkout`, "Try Again !!!", "error");
+      }
+    },
     load() {
       this.data = [];
       axios({
@@ -95,10 +106,12 @@ export default {
         }
       })
         .then(data => {
+          // console.log(data.data,'kkkkkkkkkk');
+
           var arr = data.data[0].productList;
           // console.log(arr);
           for (var i = 0; i < arr.length; i++) {
-            //   console.log(arr[i], "====");
+            // console.log(arr[i], "====");
             this.data.push(arr[i]);
             this.total += arr[i].price;
           }
@@ -108,6 +121,8 @@ export default {
         });
     },
     pay() {
+      // console.log(this.data);
+
       if (this.data.length == 0) {
         swal(`gagal`, "Try Again !!!", "error");
         throw Error;
@@ -117,33 +132,19 @@ export default {
         method: "patch",
         headers: {
           token: localStorage.getItem("token")
+        },
+        data: {
+          data: this.data
         }
       })
         .then(data => {
-          // console.log(data.data);
-          var arr = [];
-          for (var i = 0; i < this.data.length; i++) {
-            arr.push(this.data[i]._id);
-          }
-          axios({
-            url: `/transaksi/add`,
-            method: "post",
-            headers: {
-              token: localStorage.getItem("token")
-            },
-            data: {
-              price: this.total,
-              productList: arr
-            }
-          }).then(data => {
-            swal(
-              `selamat Transaksi`,
-              `${data.data._id} dalam proses pengiriman  !!!`,
-              "success"
-            );
-            this.data = [];
-            this.total = 0;
-          });
+          swal(
+            `selamat Transaksi`,
+            `${data.data._id} dalam proses pengiriman  !!!`,
+            "success"
+          );
+          this.data = [];
+          this.total = 0;
         })
         .catch(err => {
           console.log(err.message);
@@ -187,8 +188,16 @@ export default {
     }
   },
   mounted() {
-    this.$emit("to-check", true);
+    // this.$emit("to-check", true);
     this.load();
+    console.log(this.data.length);
+
+    // if (this.data.length == 0) {
+    //   console.log("checkkkkkkk");
+    //   this.$router.push("/");
+    //   this.$emit("to-check", true);
+    //   swal(`troli kosong apa lagi checkout`, "blanja dulu !!!", "error");
+    // }
   },
   updated() {}
 };

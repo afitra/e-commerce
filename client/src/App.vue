@@ -21,10 +21,14 @@
             <a class="nav item active nav-link" v-on:click="proses(true)">home</a>
           </router-link>
           <router-link to="/troli">
-            <a class="nav item active nav-link" v-on:click="getTroli(true)">Troli</a>
+            <a class="nav item active nav-link" v-on:click="getTroli(true)" v-if="adminMenu">Troli</a>
           </router-link>
           <router-link to="/checkout">
-            <a class="nav item active nav-link" v-on:click="getCheckout(true)">Checkout</a>
+            <a
+              class="nav item active nav-link"
+              v-on:click="getCheckout(true)"
+              v-if="adminMenu"
+            >Checkout</a>
           </router-link>
           <router-link to="/transaksi">
             <a class="nav item active nav-link" v-on:click="getTransaksi(true)">Transaksi</a>
@@ -36,7 +40,7 @@
             <a class="nav item active nav-link" v-on:click="proses(true)" v-if="menu">Register</a>
           </router-link>
           <router-link to="/login">
-            <a class="nav item active nav-link" v-on:click="getRegister(false)" v-if="menu">Login</a>
+            <a class="nav item active nav-link" v-if="menu">Login</a>
           </router-link>
           <a class="nav item active nav-link" v-if="menu==false" v-on:click="logout()">Logout</a>
         </ul>
@@ -61,7 +65,7 @@
     <div v-if="allData">
       <!-- <admin v-if="role" v-bind:product="item" :menu="true"></admin> -->
       <div class="kotak" v-for=" item in data " v-bind:key="item._id">
-        <card v-bind:product="item"></card>
+        <card @to-remove="muatData" v-bind:product="item"></card>
       </div>
     </div>
     <!-- <div v-if="role">
@@ -69,14 +73,12 @@
         <card v-bind:product="item"></card>
       </div>
     </div>-->
-
     <router-view
-      @to-homepage="proses($event)"
-      @to-register="getRegister($event)"
-      @to-troli="getTroli"
-      @to-check="getCheckout"
-      @to-transaksi="getTransaksi"
-      @to-login="getRole"
+      @to-homepage="hideAllData"
+      @to-troli="hideAllData"
+      @to-transaksi="hideAllData"
+      @to-login="getLogin"
+      @to-register="hideAllData"
     />
   </div>
 </template>
@@ -107,11 +109,14 @@ export default {
       troli: false,
       check: false,
       transaksi: false,
-      role: false
+      role: false,
+      adminMenu: true
     };
   },
   methods: {
     muatData() {
+      console.log("lilijkjkjkjkjkjkjk");
+
       axios({
         url: `http://localhost:3000/product/all`,
         method: "get"
@@ -123,6 +128,11 @@ export default {
         .catch(err => {
           console.log(err.message);
         });
+    },
+    getLogin() {
+      this.getRole();
+      this.showAllData();
+      this.menu = false;
     },
     proses(input) {
       var token = localStorage.getItem("token");
@@ -136,21 +146,21 @@ export default {
       this.isLogin = !input;
       this.getRole();
     },
-    getRegister(input) {
-      var token = localStorage.getItem("token");
-      // console.log(!input, "===");
-      this.isLogin = false;
-      if (!token) {
-        this.menu = true;
-      } else {
-        this.menu = false;
-      }
-      this.allData = input;
-      this.isLogin = !input;
+    hideAllData(input) {
+      console.log("jijij");
+
+      this.allData = false;
     },
+    showAllData(input) {
+      // console.log("kokokokokokok");
+      this.allData = true;
+      this.muatData();
+    },
+
     logout() {
       // console.log("masok logout");
       localStorage.removeItem("token");
+      localStorage.removeItem("role");
       swal(`Logout`, "sukses !!!", "success");
       this.menu = true;
       this.allData = true;
@@ -158,6 +168,7 @@ export default {
       this.chekout = false;
       this.transaksi = false;
       this.role = false;
+      this.adminMenu = true;
       this.$router.push("/");
     },
     getTroli(input) {
@@ -165,6 +176,9 @@ export default {
       var token = localStorage.getItem("token");
       if (!token) {
         swal(`Troli`, "kosong, Login Dulu Dong !!!", "error");
+
+        this.muatData();
+        this.$router.push("/");
       } else {
         this.allData = false;
         // this.troli = input;
@@ -177,6 +191,7 @@ export default {
       var token = localStorage.getItem("token");
       if (!token) {
         swal(`Troli`, "kosong, Login Dulu Dong !!!", "error");
+        this.$router.push("/");
       } else {
         this.allData = false;
       }
@@ -185,6 +200,8 @@ export default {
       var token = localStorage.getItem("token");
       if (!token) {
         swal(`Troli`, "kosong, Login Dulu Dong !!!", "error");
+        this.muatData();
+        this.$router.push("/");
       } else {
         this.allData = false;
       }
@@ -204,7 +221,8 @@ export default {
 
           if (role == "admin") {
             this.role = true;
-            // this.allData = false;
+            // this.allData = true;
+            this.adminMenu = false;
           } else {
             this.role = false;
           }
@@ -221,7 +239,6 @@ export default {
     this.getRole();
     var token = localStorage.getItem("token");
 
-    this.muatData();
     if (!token) {
       this.menu = true;
     } else {
@@ -231,6 +248,7 @@ export default {
     this.isLogin = false;
     this.troli = false;
     this.check = false;
+    this.muatData();
   }
 };
 </script>
